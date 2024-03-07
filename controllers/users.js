@@ -39,18 +39,20 @@ const createUser = (req, res) => {
 // GET /users/:userId
 
 const getUser = (req, res) => {
-  const { userId } = req.params._id;
+  const userId = req.user._id;
 
   User.findById(userId)
     .orFail()
-    .then((users) => res.status(200).send(users))
+    .then((user) => res.send(user))
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
         return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
-      } else if (err.name === "ValidationError") {
+      }
+      if (err.name === "ValidationError") {
         return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
-      } else if (err.name === "DocumentNotFoundError") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res.status(HTTP_NOT_FOUND).send({ message: err.message });
       }
       return res

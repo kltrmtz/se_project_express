@@ -22,7 +22,7 @@ const getItems = (req, res) => {
 // POST /items
 
 const createItem = (req, res) => {
-  console.log(req.user._id);
+  // console.log(req.user._id);
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
   Item.create({
@@ -31,10 +31,16 @@ const createItem = (req, res) => {
     imageUrl,
     owner,
   })
-    .then((item) => res.status(201).send({ data: item }))
+    .then((item) => {
+      console.log(item);
+      res.status(201).send({ data: item });
+    })
     .catch((err) => {
       console.error(err);
       console.log(err.name);
+      if (err.name === "CastError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+      }
       if (err.name === "ValidationError") {
         return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
       }
@@ -76,6 +82,15 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       console.log(err.name);
+      if (err.name === "CastError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(HTTP_NOT_FOUND).send({ message: err.message });
+      }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
         .send({ message: err.message });
@@ -96,6 +111,15 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       console.log(err.name);
+      if (err.name === "CastError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(HTTP_NOT_FOUND).send({ message: err.message });
+      }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
         .send({ message: err.message });
@@ -106,16 +130,16 @@ const dislikeItem = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-
   Item.findByIdAndDelete(itemId)
     .orFail()
-    .then((items) => res.status(204).send({ data: items }))
+    .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
+      if (err.name === "CastError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+      }
       if (err.name === "DocumentNotFoundError") {
         return res.status(HTTP_NOT_FOUND).send({ message: err.message });
-      } else if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
       }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
