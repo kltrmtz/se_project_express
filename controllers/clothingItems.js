@@ -22,7 +22,7 @@ const getItems = (req, res) => {
 // POST /items
 
 const createItem = (req, res) => {
-  // console.log(req.user._id);
+  console.log(req.user._id);
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
   Item.create({

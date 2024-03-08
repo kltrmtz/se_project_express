@@ -43,7 +43,7 @@ const getUser = (req, res) => {
 
   User.findById(userId)
     .orFail()
-    .then((user) => res.send(user))
+    .then(() => res.status(201).send.send(userId))
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
