@@ -15,7 +15,7 @@ const getItems = (req, res) => {
       console.log(err.name);
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -39,32 +39,14 @@ const createItem = (req, res) => {
       console.error(err);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
-    });
-};
-
-// UPDATE /items
-
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  Item.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      console.log(err.name);
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -83,17 +65,19 @@ const likeItem = (req, res) => {
       console.error(err);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(HTTP_NOT_FOUND).send({ message: err.message });
+        return res
+          .status(HTTP_NOT_FOUND)
+          .send({ message: "No document found for query." });
       }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -112,17 +96,19 @@ const dislikeItem = (req, res) => {
       console.error(err);
       console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(HTTP_NOT_FOUND).send({ message: err.message });
+        return res
+          .status(HTTP_NOT_FOUND)
+          .send({ message: "No document found for query." });
       }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -136,20 +122,21 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: err.message });
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(HTTP_NOT_FOUND).send({ message: err.message });
+        return res
+          .status(HTTP_NOT_FOUND)
+          .send({ message: "No document found for query." });
       }
       return res
         .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 module.exports = {
   getItems,
   createItem,
-  updateItem,
   likeItem,
   dislikeItem,
   deleteItem,
