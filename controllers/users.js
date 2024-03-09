@@ -39,7 +39,7 @@ const createUser = (req, res) => {
 // GET /users/:userId
 
 const getUser = (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.params.userId;
 
   User.findById(userId)
     .orFail()
