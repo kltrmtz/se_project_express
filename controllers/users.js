@@ -1,7 +1,10 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/user");
 const {
   HTTP_BAD_REQUEST,
+  HTTP_UNAUTHORIZED,
   HTTP_NOT_FOUND,
   HTTP_USER_DUPLICATED,
   HTTP_INTERNAL_SERVER_ERROR,
@@ -48,14 +51,12 @@ const createUser = (req, res) => {
       User.create({ name: name, avatar: avatar, email: email, password: hash }),
     )
     .then((user) =>
-      res
-        .status(201)
-        .send({
-          _id: user._id,
-          name: user.name,
-          avatar: user.avatar,
-          email: user.email,
-        }),
+      res.status(201).send({
+        _id: user._id,
+        name: user.name,
+        avatar: user.avatar,
+        email: user.email,
+      }),
     )
     .catch((err) => {
       console.error(err);
@@ -109,26 +110,62 @@ const getUser = (req, res) => {
 const userLogin = (req, res) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
+  User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error("Incorrect email or password"));
-      }
-
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) {
-        // the hashes didn't match, rejecting the promise
-        return Promise.reject(new Error("Incorrect email or password"));
-      }
-
-      // authentication successful
-      res.send({ message: "Everything good!" });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.status(200).send({ token });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      console.error(err);
+      if (!user) {
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      }
+      return res
+        .status(HTTP_UNAUTHORIZED)
+        .send({ message: "An error has occurred on the server." });
     });
 };
+
+// module.exports.login = (req, res) => {
+//   const { email, password } = req.body;
+
+//   return User.findUserByCredentials(email, password)
+//     .then((user) => {
+//       // we're creating a token
+//       const token = jwt.sign({ _id: user._id }, 'some-secret-key');
+
+//       // we return the token
+//       res.send({ token });
+//     })
+//     .catch((err) => {
+//       res
+//         .status(401)
+//         .send({ message: err.message });
+//     });
+// };
+
+//   User.findOne({ email })
+//     .then((user) => {
+//       if (!user) {
+//         return Promise.reject(new Error("Incorrect email or password"));
+//       }
+
+//       return bcrypt.compare(password, user.password);
+//     })
+//     .then((matched) => {
+//       if (!matched) {
+//         // the hashes didn't match, rejecting the promise
+//         return Promise.reject(new Error("Incorrect email or password"));
+//       }
+
+//       // authentication successful
+//       res.send({ message: "Everything good!" });
+//     })
+//     .catch((err) => {
+//       res.status(401).send({ message: err.message });
+//     });
+// };
 
 module.exports = { getUsers, createUser, getUser, userLogin };
