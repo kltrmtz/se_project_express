@@ -37,4 +37,59 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// // we're adding the findUserByCredentials methods to the User schema
+// // it will have two parameters, email and password
+// userSchema.statics.findUserByCredentials = function findUserByCredentials (email, password) {
+
+// };
+
+userSchema.statics.findUserByCredentials = function findUserByCredentials(
+  email,
+  password,
+) {
+  return User.findOne({ email })
+    .select("+password")
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error("Incorrect email or password"));
+      }
+
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        // the hashes didn't match, rejecting the promise
+        return Promise.reject(new Error("Incorrect email or password"));
+      }
+
+      // authentication successful
+      res.send({ message: "Everything good!" });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
+//   User.findOne({ email })
+//     .then((user) => {
+//       if (!user) {
+//         return Promise.reject(new Error("Incorrect email or password"));
+//       }
+
+//       return bcrypt.compare(password, user.password);
+//     })
+//     .then((matched) => {
+//       if (!matched) {
+//         // the hashes didn't match, rejecting the promise
+//         return Promise.reject(new Error("Incorrect email or password"));
+//       }
+
+//       // authentication successful
+//       res.send({ message: "Everything good!" });
+//     })
+//     .catch((err) => {
+//       res.status(401).send({ message: err.message });
+//     });
+// };
+
 module.exports = mongoose.model("user", userSchema);

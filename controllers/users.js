@@ -146,26 +146,72 @@ const userLogin = (req, res) => {
 //     });
 // };
 
-//   User.findOne({ email })
-//     .then((user) => {
-//       if (!user) {
-//         return Promise.reject(new Error("Incorrect email or password"));
-//       }
+// GET currentUser
 
-//       return bcrypt.compare(password, user.password);
-//     })
-//     .then((matched) => {
-//       if (!matched) {
-//         // the hashes didn't match, rejecting the promise
-//         return Promise.reject(new Error("Incorrect email or password"));
-//       }
+const getCurrentUser = (req, res) => {
+  const { userId } = req.params.user._id;
 
-//       // authentication successful
-//       res.send({ message: "Everything good!" });
-//     })
-//     .catch((err) => {
-//       res.status(401).send({ message: err.message });
-//     });
-// };
+  User.findById(userId)
+    .orFail()
+    .then((user) => res.status(200).send(user))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(HTTP_NOT_FOUND)
+          .send({ message: "No document found for query." });
+      }
+      return res
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
 
-module.exports = { getUsers, createUser, getUser, userLogin };
+const updateProfile = (req, res) => {
+  const { userId } = req.params.user._id;
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    { userId, name, avatar },
+    { new: true },
+    { runValidators: true },
+  )
+    .orFail()
+    .then((user) => {
+      console.log(user);
+      res.status(200).send({ data: user });
+    })
+    .catch((err) => {
+      console.error(err);
+      console.log(err.name);
+      if (err.name === "CastError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      }
+      if (err.name === "ValidationError") {
+        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(HTTP_NOT_FOUND)
+          .send({ message: "No document found for query." });
+      }
+      return res
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
+// module.exports = { getUsers, createUser, getUser, userLogin };
+module.exports = {
+  getUsers,
+  createUser,
+  getUser,
+  userLogin,
+  getCurrentUser,
+  updateProfile,
+};
