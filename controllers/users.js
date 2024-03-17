@@ -64,7 +64,7 @@ const createUser = (req, res) => {
       //   console.error("Duplicate key error. Document already exists!");
       //   // Handle the duplicate key error here (e.g., retry with different data)
       // }
-      if (error.code === 11000) {
+      if (err.code === 11000) {
         return res
           .status(HTTP_USER_DUPLICATED)
           .send({ message: "Duplicate error." });

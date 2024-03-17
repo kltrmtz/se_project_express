@@ -1,6 +1,7 @@
 const Item = require("../models/clothingItem");
 const {
   HTTP_BAD_REQUEST,
+  HTTP_FORBIDDEN,
   HTTP_NOT_FOUND,
   HTTP_INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
@@ -118,7 +119,13 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   Item.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => {
+      if ((item.owner = req.user_id))
+        return res.status(HTTP_FORBIDDEN).send({
+          message: "You do not have not permission to access this resource",
+        });
+    })
+    .then(() => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
