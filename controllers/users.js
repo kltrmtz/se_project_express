@@ -42,7 +42,7 @@ const getUsers = (req, res) => {
 //     )
 //     .then((user) =>
 //       res.status(201).send({
-//         _id: user._id,
+//         // _id: user._id,
 //         name: user.name,
 //         avatar: user.avatar,
 //         email: user.email,
@@ -72,19 +72,15 @@ const createUser = (req, res) => {
     .select("+password")
     .then((user) => {
       if (user) {
-        return (
-          res.status(HTTP_USER_DUPLICATED),
-          {
-            message: "Duplicate error.",
-          }
-        );
+        return res.status(HTTP_USER_DUPLICATED);
+        // .send({ message: "Duplicate error." });
       }
-      // if (user) {
-      //   return (
-      //     res
-      //       .status(HTTP_USER_DUPLICATED)
-      //       .send({ message: "Duplicate error." })
-      //   );
+      // // if (user) {
+      // //   return (
+      // //     res
+      // //       .status(HTTP_USER_DUPLICATED)
+      // //       .send({ message: "Duplicate error." })
+      // //   );
 
       return bcrypt.hash(password, 10);
     })
@@ -101,13 +97,13 @@ const createUser = (req, res) => {
         name: user.name,
         avatar: user.avatar,
         email: user.email,
-        user: user._id,
+        // user: user._id,
       }),
     )
     .catch((err) => {
       console.error(err);
       console.log(err.name);
-      if (err.code === 409) {
+      if (err.code === 11000) {
         return res
           .status(HTTP_USER_DUPLICATED)
           .send({ message: "Duplicate error." });
@@ -161,7 +157,7 @@ const userLogin = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if ((!email, !password)) {
+      if (!email || !password) {
         return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       return res
@@ -200,10 +196,17 @@ const getCurrentUser = (req, res) => {
 const updateProfile = (req, res) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
+
   User.findByIdAndUpdate(
-    (userId, { name, avatar }),
-    { new: true },
-    { runValidators: true },
+    userId,
+    {
+      name: name,
+      avatar: avatar,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
     .orFail()
     .then((user) => {

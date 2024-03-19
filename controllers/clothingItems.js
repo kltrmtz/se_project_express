@@ -118,17 +118,18 @@ const dislikeItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   Item.findById(itemId)
-    // .orFail()
+    .orFail()
     .then((item) => {
-      if (item.owner === req.user_id)
+      // if (!item.owner.equals(req.user_id)) {
+      if (item.owner.toString() !== req.user._id.toString()) {
         return res.status(HTTP_FORBIDDEN).send({
-          message: "You do not have not permission to access this resource",
+          message: "You do not have not permission to access this resource.",
         });
-      return (
-        Item.findByIdAndDelete(itemId)
-          // .orFail()
-          .then(() => res.status(200).send({ message: "Item deleted" }))
-      );
+      }
+
+      return Item.findByIdAndDelete(itemId)
+        .orFail()
+        .then(() => res.status(200).send(item));
     })
 
     .catch((err) => {
