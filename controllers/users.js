@@ -9,6 +9,7 @@ const {
   HTTP_USER_DUPLICATED,
   HTTP_INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
+const user = require("../models/user");
 
 // GET /users
 
@@ -25,50 +26,91 @@ const getUsers = (req, res) => {
 
 // POST /users
 
-// app.post('/signup', (req, res) => {
-//   bcrypt.hash(req.body.password, 10)
-//     .then((hash) => User.create({
-//       email: req.body.email,
-//       password: hash,
-//     }))
-//     .then((user) => {
+// const createUser = (req, res) => {
+//   const { name, avatar, email, password } = req.body;
+
+//   bcrypt
+//     .hash(password, 10)
+//     .then((hash) =>
+//       // User.create({
+//       //   name: name,
+//       //   avatar: avatar,
+//       //   email: email,
+//       //   password: hash,
+//       // }),
+//       User.create({ name, avatar, email, password: hash }),
+//     )
+//     .then((user) =>
 //       res.status(201).send({
 //         _id: user._id,
-//         email: user.email
-//       });
-//     })
+//         name: user.name,
+//         avatar: user.avatar,
+//         email: user.email,
+//       }),
+//     )
 //     .catch((err) => {
-//       res.status(400).send(err);
+//       console.error(err);
+//       console.log(err.name);
+//       if (err.code === 11000) {
+//         return res
+//           .status(HTTP_USER_DUPLICATED)
+//           .send({ message: "Duplicate error." });
+//       }
+//       if (err.name === "ValidationError") {
+//         return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+//       }
+//       return res
+//         .status(HTTP_INTERNAL_SERVER_ERROR)
+//         .send({ message: "An error has occurred on the server." });
 //     });
-// });
+// };
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  bcrypt
-    .hash(password, 10)
+  User.findOne({ email })
+    .select("+password")
+    .then((user) => {
+      if (user) {
+        return (
+          res.status(HTTP_USER_DUPLICATED),
+          {
+            message: "Duplicate error.",
+          }
+        );
+      }
+      // if (user) {
+      //   return (
+      //     res
+      //       .status(HTTP_USER_DUPLICATED)
+      //       .send({ message: "Duplicate error." })
+      //   );
+
+      return bcrypt.hash(password, 10);
+    })
     .then((hash) =>
-      User.create({ name: name, avatar: avatar, email: email, password: hash }),
+      User.create({
+        name,
+        avatar,
+        email,
+        password: hash,
+      }),
     )
     .then((user) =>
       res.status(201).send({
-        _id: user._id,
         name: user.name,
         avatar: user.avatar,
         email: user.email,
+        user: user._id,
       }),
     )
     .catch((err) => {
       console.error(err);
-      // if (error.code === 11000) {
-      //   console.error("Duplicate key error. Document already exists!");
-      //   // Handle the duplicate key error here (e.g., retry with different data)
-      // }
-      if (err.code === 11000) {
+      console.log(err.name);
+      if (err.code === 409) {
         return res
           .status(HTTP_USER_DUPLICATED)
           .send({ message: "Duplicate error." });
-        // Handle the duplicate key error here (e.g., retry with different data)
       }
       if (err.name === "ValidationError") {
         return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
@@ -119,7 +161,7 @@ const userLogin = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (!user) {
+      if ((!email, !password)) {
         return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
       return res
@@ -128,28 +170,10 @@ const userLogin = (req, res) => {
     });
 };
 
-// module.exports.login = (req, res) => {
-//   const { email, password } = req.body;
-
-//   return User.findUserByCredentials(email, password)
-//     .then((user) => {
-//       // we're creating a token
-//       const token = jwt.sign({ _id: user._id }, 'some-secret-key');
-
-//       // we return the token
-//       res.send({ token });
-//     })
-//     .catch((err) => {
-//       res
-//         .status(401)
-//         .send({ message: err.message });
-//     });
-// };
-
 // GET currentUser
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.params.user._id;
+  const userId = req.user._id;
 
   User.findById(userId)
     .orFail()
@@ -174,10 +198,10 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateProfile = (req, res) => {
-  const { userId } = req.params.user._id;
+  const userId = req.user._id;
   const { name, avatar } = req.body;
   User.findByIdAndUpdate(
-    { userId, name, avatar },
+    (userId, { name, avatar }),
     { new: true },
     { runValidators: true },
   )
@@ -185,6 +209,7 @@ const updateProfile = (req, res) => {
     .then((user) => {
       console.log(user);
       res.status(200).send({ data: user });
+      return user;
     })
     .catch((err) => {
       console.error(err);
