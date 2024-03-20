@@ -69,19 +69,12 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   User.findOne({ email })
-    .select("+password")
     .then((user) => {
       if (user) {
-        return res.status(HTTP_USER_DUPLICATED);
-        // .send({ message: "Duplicate error." });
+        const error = new Error("Duplicate user");
+        error.statusCode = HTTP_USER_DUPLICATED;
+        throw error;
       }
-      // // if (user) {
-      // //   return (
-      // //     res
-      // //       .status(HTTP_USER_DUPLICATED)
-      // //       .send({ message: "Duplicate error." })
-      // //   );
-
       return bcrypt.hash(password, 10);
     })
     .then((hash) =>
@@ -100,10 +93,11 @@ const createUser = (req, res) => {
         // user: user._id,
       }),
     )
+
     .catch((err) => {
       console.error(err);
-      console.log(err.name);
-      if (err.code === 11000) {
+      // console.log(err.name);
+      if (err.statusCode === HTTP_USER_DUPLICATED) {
         return res
           .status(HTTP_USER_DUPLICATED)
           .send({ message: "Duplicate error." });
