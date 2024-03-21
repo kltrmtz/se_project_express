@@ -9,20 +9,6 @@ const {
   HTTP_USER_DUPLICATED,
   HTTP_INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
-// const user = require("../models/user");
-
-// GET /users
-
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
-    });
-};
 
 // POST /users
 
@@ -30,7 +16,8 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email) {
-    return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+    res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+    return;
   }
 
   User.findOne({ email })
@@ -75,36 +62,14 @@ const createUser = (req, res) => {
     });
 };
 
-// GET /users/:userId
-
-const getUser = (req, res) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
-    .orFail()
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      }
-      if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(HTTP_NOT_FOUND)
-          .send({ message: "No document found for query." });
-      }
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
-    });
-};
-
 // UserLogin
 const userLogin = (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+    return;
+  }
 
   User.findUserByCredentials(email, password)
     .then((user) => {
@@ -115,12 +80,18 @@ const userLogin = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (!email || !password) {
+
+      if (err.name === "ValidationError") {
         return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
       }
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(HTTP_UNAUTHORIZED)
+          .send({ message: "Unauthorized data." });
+      }
       return res
-        .status(HTTP_UNAUTHORIZED)
-        .send({ message: "Unauthorized data." });
+        .status(HTTP_INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -192,11 +163,8 @@ const updateProfile = (req, res) => {
     });
 };
 
-// module.exports = { getUsers, createUser, getUser, userLogin };
 module.exports = {
-  getUsers,
   createUser,
-  getUser,
   userLogin,
   getCurrentUser,
   updateProfile,
