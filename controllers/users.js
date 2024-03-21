@@ -26,47 +26,12 @@ const getUsers = (req, res) => {
 
 // POST /users
 
-// const createUser = (req, res) => {
-//   const { name, avatar, email, password } = req.body;
-
-//   bcrypt
-//     .hash(password, 10)
-//     .then((hash) =>
-//       // User.create({
-//       //   name: name,
-//       //   avatar: avatar,
-//       //   email: email,
-//       //   password: hash,
-//       // }),
-//       User.create({ name, avatar, email, password: hash }),
-//     )
-//     .then((user) =>
-//       res.status(201).send({
-//         // _id: user._id,
-//         name: user.name,
-//         avatar: user.avatar,
-//         email: user.email,
-//       }),
-//     )
-//     .catch((err) => {
-//       console.error(err);
-//       console.log(err.name);
-//       if (err.code === 11000) {
-//         return res
-//           .status(HTTP_USER_DUPLICATED)
-//           .send({ message: "Duplicate error." });
-//       }
-//       if (err.name === "ValidationError") {
-//         return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-//       }
-//       return res
-//         .status(HTTP_INTERNAL_SERVER_ERROR)
-//         .send({ message: "An error has occurred on the server." });
-//     });
-// };
-
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
+
+  if (!email) {
+    return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+  }
 
   User.findOne({ email })
     .then((user) => {
@@ -75,6 +40,7 @@ const createUser = (req, res) => {
         error.statusCode = HTTP_USER_DUPLICATED;
         throw error;
       }
+
       return bcrypt.hash(password, 10);
     })
     .then((hash) =>
@@ -90,13 +56,11 @@ const createUser = (req, res) => {
         name: user.name,
         avatar: user.avatar,
         email: user.email,
-        // user: user._id,
       }),
     )
 
     .catch((err) => {
       console.error(err);
-      // console.log(err.name);
       if (err.statusCode === HTTP_USER_DUPLICATED) {
         return res
           .status(HTTP_USER_DUPLICATED)
@@ -156,7 +120,7 @@ const userLogin = (req, res) => {
       }
       return res
         .status(HTTP_UNAUTHORIZED)
-        .send({ message: "An error has occurred on the server." });
+        .send({ message: "Unauthorized data." });
     });
 };
 

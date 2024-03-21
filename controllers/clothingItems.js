@@ -57,7 +57,7 @@ const likeItem = (req, res) => {
   console.log(req.params.itemId);
   Item.findByIdAndUpdate(
     req.params.itemId,
-    { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .orFail()
@@ -88,7 +88,7 @@ const dislikeItem = (req, res) => {
   console.log(req.params.itemId);
   Item.findByIdAndUpdate(
     req.params.itemId,
-    { $pull: { likes: req.user._id } }, // remove _id from the array
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .orFail()
@@ -154,7 +154,3 @@ module.exports = {
   dislikeItem,
   deleteItem,
 };
-
-// module.exports.createItem = (req, res) => {
-//   console.log(req.user._id); // _id will become accessible
-// };
