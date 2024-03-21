@@ -73,6 +73,7 @@ const createUser = (req, res) => {
         .status(HTTP_INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
+  return;
 };
 
 // GET /users/:userId
@@ -158,8 +159,8 @@ const updateProfile = (req, res) => {
   User.findByIdAndUpdate(
     userId,
     {
-      name: name,
-      avatar: avatar,
+      name,
+      avatar,
     },
     {
       new: true,
