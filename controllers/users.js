@@ -9,7 +9,7 @@ const {
   HTTP_USER_DUPLICATED,
   HTTP_INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
-const user = require("../models/user");
+// const user = require("../models/user");
 
 // GET /users
 
