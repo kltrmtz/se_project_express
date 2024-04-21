@@ -8,21 +8,28 @@ const {
 
 // GET /items
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   Item.find({})
     .then((items) => res.status(200).send(items))
     .catch((err) => {
-      console.error(err);
-      console.log(err.name);
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
+      if (HTTP_INTERNAL_SERVER_ERROR) {
+        next(
+          new HTTP_INTERNAL_SERVER_ERROR(
+            "An error has occurred on the server.",
+          ),
+        );
+      }
+      // console.error(err);
+      // console.log(err.name);
+      // return res
+      //   .status(HTTP_INTERNAL_SERVER_ERROR)
+      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
 // POST /items
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   console.log(req.user._id);
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
@@ -37,23 +44,31 @@ const createItem = (req, res) => {
       res.status(201).send({ data: item });
     })
     .catch((err) => {
-      console.error(err);
-      console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("The id string is in an invalid format"));
       }
       if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("Invalid data"));
+      } else {
+        next(err);
       }
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
+      // console.error(err);
+      // console.log(err.name);
+      // if (err.name === "CastError") {
+      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      // }
+      // if (err.name === "ValidationError") {
+      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      // }
+      // return res
+      //   .status(HTTP_INTERNAL_SERVER_ERROR)
+      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
 // PUT /items/:itemId/likes — like an item
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   console.log(req.params.itemId);
   Item.findByIdAndUpdate(
     req.params.itemId,
@@ -63,28 +78,40 @@ const likeItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      console.error(err);
-      console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("Invalid data"));
       }
       if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("Invalid data"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(HTTP_NOT_FOUND)
-          .send({ message: "No document found for query." });
+        next(new HTTP_NOT_FOUND("No document found for query."));
+      } else {
+        next(err);
       }
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
     });
+  //   console.error(err);
+  //   console.log(err.name);
+  //   if (err.name === "CastError") {
+  //     return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+  //   }
+  //   if (err.name === "ValidationError") {
+  //     return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+  //   }
+  //   if (err.name === "DocumentNotFoundError") {
+  //     return res
+  //       .status(HTTP_NOT_FOUND)
+  //       .send({ message: "No document found for query." });
+  //   }
+  //   return res
+  //     .status(HTTP_INTERNAL_SERVER_ERROR)
+  //     .send({ message: "An error has occurred on the server." });
+  // });
 };
 
 // DELETE /items/:itemId/likes — unlike an item
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   console.log(req.params.itemId);
   Item.findByIdAndUpdate(
     req.params.itemId,
@@ -94,28 +121,39 @@ const dislikeItem = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      console.error(err);
-      console.log(err.name);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("Invalid data"));
       }
       if (err.name === "ValidationError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("Invalid data"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(HTTP_NOT_FOUND)
-          .send({ message: "No document found for query." });
+        next(new HTTP_NOT_FOUND("No document found for query."));
+      } else {
+        next(err);
       }
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
+      // console.error(err);
+      // console.log(err.name);
+      // if (err.name === "CastError") {
+      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      // }
+      // if (err.name === "ValidationError") {
+      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      // }
+      // if (err.name === "DocumentNotFoundError") {
+      //   return res
+      //     .status(HTTP_NOT_FOUND)
+      //     .send({ message: "No document found for query." });
+      // }
+      // return res
+      //   .status(HTTP_INTERNAL_SERVER_ERROR)
+      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
 // DELETE /items/:itemId
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   Item.findById(itemId)
     .orFail()
@@ -133,18 +171,26 @@ const deleteItem = (req, res) => {
     })
 
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
-        return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+        next(new HTTP_BAD_REQUEST("Invalid data"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(HTTP_NOT_FOUND)
-          .send({ message: "No document found for query." });
+        next(new HTTP_NOT_FOUND("No document found for query."));
+      } else {
+        next(err);
       }
-      return res
-        .status(HTTP_INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
+      // console.error(err);
+      // if (err.name === "CastError") {
+      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
+      // }
+      // if (err.name === "DocumentNotFoundError") {
+      //   return res
+      //     .status(HTTP_NOT_FOUND)
+      //     .send({ message: "No document found for query." });
+      // }
+      // return res
+      //   .status(HTTP_INTERNAL_SERVER_ERROR)
+      //   .send({ message: "An error has occurred on the server." });
     });
 };
 module.exports = {
