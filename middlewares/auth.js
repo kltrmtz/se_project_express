@@ -6,9 +6,11 @@ const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    return res
-      .status(HTTP_UNAUTHORIZED)
-      .send({ message: "Authorization Required" });
+    next(new HTTP_UNAUTHORIZED("Authorization Required"));
+
+    // return res
+    //   .status(HTTP_UNAUTHORIZED)
+    //   .send({ message: "Authorization Required" });
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -17,9 +19,10 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return res
-      .status(HTTP_UNAUTHORIZED)
-      .send({ message: "Authorization Required" });
+    next(new HTTP_UNAUTHORIZED("Authorization Required"));
+    // return res
+    //   .status(HTTP_UNAUTHORIZED)
+    //   .send({ message: "Authorization Required" });
   }
 
   req.user = payload; // assigning the payload to the request object
