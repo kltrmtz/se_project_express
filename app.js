@@ -46,6 +46,12 @@ app.use(errorLogger); // enabling the error logger
 app.use(errors()); // celebrate error handler
 app.use(errorHandler); //centralized error handler
 
+// app.use(
+//   cors({
+//     origin: "https://www.wtwr.pakasak.com",
+//   }),
+// );
+
 // app.use((req, res, next) => {
 //   res.setHeader("Access-Control-Allow-Origin", "https://wtwr.pakasak.com");
 //   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
