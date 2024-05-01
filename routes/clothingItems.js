@@ -12,14 +12,14 @@ const {
   validateId,
 } = require("../middlewares/validation");
 
-router.get("/", getItems, validateId);
+router.get("/", getItems);
 
 router.use(auth);
 
-router.post("/", createItem, validateClothingItemBodyCreate);
-router.put("/:itemId/likes", likeItem, validateId);
-router.delete("/:itemId/likes", dislikeItem, validateId);
-router.delete("/:itemId", deleteItem, validateId);
+router.post("/", validateClothingItemBodyCreate, createItem);
+router.put("/:itemId/likes", validateId, likeItem);
+router.delete("/:itemId/likes", validateId, dislikeItem);
+router.delete("/:itemId", validateId, deleteItem);
 
 module.exports = router;
 

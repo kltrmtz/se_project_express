@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
 
-const errorHandler = require("./middlewares/error-handler");
 const { errors } = require("celebrate");
+const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const indexRouter = require("./routes/index");
@@ -34,7 +34,6 @@ app.get("/crash-test", () => {
 app.use("/", indexRouter);
 
 app.use(requestLogger);
-app.use(routes);
 
 app.use(errorLogger); // enabling the error logger
 

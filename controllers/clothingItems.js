@@ -1,10 +1,8 @@
 const Item = require("../models/clothingItem");
-const {
-  HTTP_BAD_REQUEST,
-  HTTP_FORBIDDEN,
-  HTTP_NOT_FOUND,
-  HTTP_INTERNAL_SERVER_ERROR,
-} = require("../utils/errors");
+
+const BadRequestError = require("../utils/errors/badRequestError");
+const ForbiddenError = require("../utils/errors/forbiddenError");
+const NotFoundError = require("../utils/errors/notFoundError");
 
 // GET /items
 
@@ -34,10 +32,10 @@ const createItem = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new HTTP_BAD_REQUEST("The id string is in an invalid format"));
+        next(new BadRequestError("The id string is in an invalid format"));
       }
       if (err.name === "ValidationError") {
-        next(new HTTP_BAD_REQUEST("Invalid data"));
+        next(new BadRequestError("Invalid data"));
       } else {
         next(err);
       }
@@ -57,13 +55,13 @@ const likeItem = (req, res, next) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new HTTP_BAD_REQUEST("Invalid data"));
+        next(new BadRequestError("Invalid data"));
       }
       if (err.name === "ValidationError") {
-        next(new HTTP_BAD_REQUEST("Invalid data"));
+        next(new BadRequestError("Invalid data"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new HTTP_NOT_FOUND("No document found for query."));
+        next(new NotFoundError("No document found for query."));
       } else {
         next(err);
       }
@@ -83,13 +81,13 @@ const dislikeItem = (req, res, next) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new HTTP_BAD_REQUEST("Invalid data"));
+        next(new BadRequestError("Invalid data"));
       }
       if (err.name === "ValidationError") {
-        next(new HTTP_BAD_REQUEST("Invalid data"));
+        next(new BadRequestError("Invalid data"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new HTTP_NOT_FOUND("No document found for query."));
+        next(new NotFoundError("No document found for query."));
       } else {
         next(err);
       }
@@ -104,9 +102,11 @@ const deleteItem = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
-        return res.status(HTTP_FORBIDDEN).send({
-          message: "You do not have not permission to access this resource.",
-        });
+        return next(
+          new ForbiddenError(
+            "You do not have not permission to access this resource.",
+          ),
+        );
       }
 
       return Item.findByIdAndDelete(itemId)
@@ -116,10 +116,10 @@ const deleteItem = (req, res, next) => {
 
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new HTTP_BAD_REQUEST("Invalid data"));
+        next(new BadRequestError("Invalid data"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new HTTP_NOT_FOUND("No document found for query."));
+        next(new NotFoundError("No document found for query."));
       } else {
         next(err);
       }

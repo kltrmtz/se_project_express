@@ -4,7 +4,7 @@ const errorHandler = (err, req, res, next) => {
     return res.status(err.statusCode).send({ message: err.message });
   }
   return res
-    .status(HTTP_INTERNAL_SERVER_ERROR)
+    .status(500)
     .send({ message: "An error has occurred on the server." });
 };
 
