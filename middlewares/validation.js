@@ -66,21 +66,6 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
-// module.exports.validateCardBody = celebrate({
-//   body: Joi.object().keys({
-//     name: Joi.string().required().min(2).max(30).messages({
-//       "string.min": 'The minimum length of the "name" field is 2',
-//       "string.max": 'The maximum length of the "name" field is 30',
-//       "string.empty": 'The "name" field must be filled in',
-//     }),
-
-//     imageUrl: Joi.string().required().custom(validateURL).messages({
-//       "string.empty": 'The "imageUrl" field must be filled in',
-//       "string.uri": 'the "imageUrl" field must be a valid url',
-//     }),
-//   }),
-// });
-
 // 1. The clothing item body when an item is created
 // The item name is a required string of between 2 and 30 characters.
 // An image URL is a required string in a URL format.
@@ -153,6 +138,22 @@ module.exports.validateId = celebrate({
     id: Joi.string().required().hex().length(24).messages({
       "string.hex": "ID must be hexadecimal",
       "string.length": "ID must be length of 24 characters",
+    }),
+  }),
+});
+
+// 5. Update User info
+
+module.exports.validateUserBodyUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30).messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field must be filled in',
+    }),
+    avatarUrl: Joi.string().required().custom(validateURL).messages({
+      "string.empty": 'The "avatarUrl" field must be filled in',
+      "string.uri": 'The "avatarUrl" field must be a valid url',
     }),
   }),
 });

@@ -20,12 +20,6 @@ mongoose
 
 app.use(cors());
 
-// app.use(
-//   cors({
-//     origin: "https://www.wtwr.pakasak.com",
-//   }),
-// );
-
 app.use(helmet());
 
 app.use(express.json());
@@ -46,57 +40,6 @@ app.use(errorLogger); // enabling the error logger
 app.use(errors()); // celebrate error handler
 app.use(errorHandler); //centralized error handler
 
-// app.use(
-//   cors({
-//     origin: "https://www.wtwr.pakasak.com",
-//   }),
-// );
-
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "https://wtwr.pakasak.com");
-//   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-//   next();
-// });
-
-// app.options("/", (req, res) => {
-//   res.setHeader("Access-Control-Allow-Origin", "https://www.wtwr.pakasak.com");
-//   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-//   res.sendStatus(204);
-// });
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-// app.use((err, req, res, next) => {
-//   // this is the error handler
-// });
-
-// app.use((err, req, res, next) => {
-//   console.error(err);
-//   // if an error has no status, set it to 500
-//   const { statusCode = 500, message } = err;
-//   res.status(statusCode).send({
-//     // check the status and display a message based on it
-//     message: statusCode === 500 ? "An error occurred on the server" : message,
-//   });
-// });
-
-// we handle all errors here, by logging the error to the console
-// and sending a response with an appropriate status code and message
-// app.use((err, req, res, next) => {
-//   console.error(err);
-//   return res.status(500).send({ message: "An error occurred on the server" });
-// });
-
-// next("Argument");
-// next(new Error("Authorization error"));
-
-// app.use((err, req, res, next) => {
-//   console.error(err);
-//   res.send({ message: err.message });
-// });
-
-// { "message": "Authorization error" }

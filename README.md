@@ -14,10 +14,16 @@ This is the back-end project creating a server for the WTWR application. Setting
 
 - [Create React App](https://github.com/facebook/create-react-app)
 
-## Link to Back End
+## Link to Frontend
 
-- [Express Back End](https://github.com/kltrmtz/se_project_express.git)
+- [React Frontend](https://github.com/kltrmtz/se_project_react.git)
 
-## Project Domain Link
+## Link to Backend
 
-http://wtwr.pakasak.com
+- [Express Backend](https://github.com/kltrmtz/se_project_express.git)
+
+## Project Domain Links
+
+- [Frontend Domain](http://wtwr.pakasak.com)
+
+- [Backend Domain](http://api.wtwr.pakasak.com)

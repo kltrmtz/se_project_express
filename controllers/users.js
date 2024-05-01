@@ -58,18 +58,6 @@ const createUser = (req, res, next) => {
       } else {
         next(err);
       }
-      // console.error(err);
-      // if (err.statusCode === HTTP_USER_DUPLICATED) {
-      //   return res
-      //     .status(HTTP_USER_DUPLICATED)
-      //     .send({ message: "Duplicate error." });
-      // }
-      // if (err.name === "ValidationError") {
-      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // return res
-      //   .status(HTTP_INTERNAL_SERVER_ERROR)
-      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -98,19 +86,6 @@ const userLogin = (req, res, next) => {
       } else {
         next(err);
       }
-      // console.error(err);
-
-      // if (err.name === "ValidationError") {
-      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // if (err.message === "Incorrect email or password") {
-      //   return res
-      //     .status(HTTP_UNAUTHORIZED)
-      //     .send({ message: "Unauthorized data." });
-      // }
-      // return res
-      //   .status(HTTP_INTERNAL_SERVER_ERROR)
-      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -134,21 +109,6 @@ const getCurrentUser = (req, res, next) => {
       } else {
         next(err);
       }
-      // console.error(err);
-      // if (err.name === "CastError") {
-      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // if (err.name === "ValidationError") {
-      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // if (err.name === "DocumentNotFoundError") {
-      //   return res
-      //     .status(HTTP_NOT_FOUND)
-      //     .send({ message: "No document found for query." });
-      // }
-      // return res
-      //   .status(HTTP_INTERNAL_SERVER_ERROR)
-      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -185,22 +145,6 @@ const updateProfile = (req, res, next) => {
       } else {
         next(err);
       }
-      // console.error(err);
-      // console.log(err.name);
-      // if (err.name === "CastError") {
-      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // if (err.name === "ValidationError") {
-      //   return res.status(HTTP_BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // if (err.name === "DocumentNotFoundError") {
-      //   return res
-      //     .status(HTTP_NOT_FOUND)
-      //     .send({ message: "No document found for query." });
-      // }
-      // return res
-      //   .status(HTTP_INTERNAL_SERVER_ERROR)
-      //   .send({ message: "An error has occurred on the server." });
     });
 };
 
