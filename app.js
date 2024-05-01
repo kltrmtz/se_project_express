@@ -38,7 +38,7 @@ app.use(routes);
 app.use(errorLogger); // enabling the error logger
 
 app.use(errors()); // celebrate error handler
-app.use(errorHandler); //centralized error handler
+app.use(errorHandler); // centralized error handler
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
