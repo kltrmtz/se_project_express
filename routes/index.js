@@ -3,7 +3,7 @@ const router = require("express").Router();
 const userRouter = require("./users");
 const itemRouter = require("./clothingItems");
 const { createUser, userLogin } = require("../controllers/users");
-const { HTTP_NOT_FOUND } = require("../utils/errors/errors");
+const NotFoundError = require("../utils/errors/notFoundError");
 const {
   validateUserBodyCreate,
   validateAuth,
@@ -16,7 +16,7 @@ router.post("/signin", validateAuth, userLogin);
 router.post("/signup", validateUserBodyCreate, createUser);
 
 router.use((req, res, next) => {
-  next(new HTTP_NOT_FOUND("No document found for query."));
+  next(new NotFoundError("No document found for query."));
 });
 
 module.exports = router;
